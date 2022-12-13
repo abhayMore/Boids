@@ -1,5 +1,7 @@
-#include "Vector2.h"
+#include "vector2.hpp"
+
 #include <cmath>
+
 template<class T>
 Vector2<T>::Vector2():x(0.0f),y(0.0f)
 {
@@ -20,10 +22,6 @@ sf::Vector2<float> Vector2<T>::ConverttoSF()
 {
   return sf::Vector2<float>(static_cast<T>(x),static_cast<T>(y));
 }
-
-
-
-
 
 template<class T>
 Vector2<T> Vector2<T>::add( Vector2<T> a)
@@ -79,10 +77,6 @@ Vector2<T> Vector2<T>::limit(int n)
   return *this;
 }
 
-
-
-
-
 template<class T>
 Vector2<T> Vector2<T>::operator+( const Vector2<T>& Right )
 {
@@ -108,7 +102,6 @@ bool Vector2<T>::operator!=(const Vector2<T> &obj)
 {
   return !((x == obj.x) && (y == obj.y));
 }
-
 
 template<class T>
 bool Vector2<T>::operator==(const Vector2<T> &obj)

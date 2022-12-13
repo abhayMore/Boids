@@ -24,7 +24,6 @@ explicit Vector2<T>(const Vector2<U>& vector);
 sf::Vector2<float> ConverttoSF();
 
 
-
 Vector2<T> add( Vector2<T>);
 Vector2<T> sub( Vector2<T>);
 Vector2<T> divide( int);

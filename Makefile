@@ -2,7 +2,7 @@ EXEC = sfml-app
 CC = g++
 CFLAGS = -std=c++17 -c -Wall
 LDFLAGS = -std=c++17 -o $(EXEC) -ltgui -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
-SRCS = Vector2.cpp Boids.cpp main.cpp
+SRCS = $(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(EXEC)
