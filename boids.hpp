@@ -1,5 +1,8 @@
 #pragma once
+
 #include "vector2.hpp"
+
+#include <SFML/Graphics.hpp>
 
 class Boids {
   Vector2f position;
@@ -26,7 +29,7 @@ class Boids {
 
   template <std::size_t S>
   void flock(Boids (&otherBoids)[S], std::vector<sf::CircleShape> &shape,
-             int alignmentRadius, int aohesionRadius, int separationRadius);
+             int alignmentRadius, int cohesionRadius, int separationRadius);
 
   void update();
   void draw(sf::RenderWindow &window);

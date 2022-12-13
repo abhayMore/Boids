@@ -14,7 +14,7 @@ Boids::Boids() {
 
   sprite.setScale(0.02f, 0.02f);
   position = Vector2f(ReturnIntRandom(0, 800), ReturnIntRandom(0, 500));
-  sprite.setPosition(position.ConverttoSF());
+  sprite.setPosition(position.x, position.y);
   auto phi = rand() / (double)(RAND_MAX);
   phi *= 2.0 * M_PI;
   velocity = Vector2f(sin(phi), cos(phi));
@@ -45,16 +45,16 @@ Vector2f Boids::align(Boids (&otherBoids)[S], int alignmentRadius) {
   size_t total = 0;
 
   for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++) {
-    auto distance = position.dist(otherBoids[i].position);
+    auto distance = position.distance(otherBoids[i].position);
     if (*this != otherBoids[i] && distance < perceptionRadius) {
-      steering = steering.add(otherBoids[i].velocity);
+      steering = steering + otherBoids[i].velocity;
       total++;
     }
   }
   if (total > 0) {
-    steering = steering.divide(total);
+    steering = steering / total;
     steering = steering.setMag(maxSpeed);
-    steering = steering.sub(velocity);
+    steering = steering - velocity;
     steering = steering.limit(maxForce);
   }
   return steering;
@@ -67,19 +67,19 @@ Vector2f Boids::separation(Boids (&otherBoids)[S], int separationRadius) {
 
   size_t total = 0;
   for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++) {
-    float distance = position.dist(otherBoids[i].position);
+    float distance = position.distance(otherBoids[i].position);
     if ((*this != otherBoids[i]) && (distance < perceptionRadius) &&
         (distance > 0.0f)) {
-      Vector2f diff = position.sub(otherBoids[i].position);
-      if (distance < 1.0f) diff = diff.mult(1 / (distance * distance));
-      steering = steering.add(diff);
+      Vector2f diff = position - otherBoids[i].position;
+      if (distance < 1.0f) diff = diff * (1 / (distance * distance));
+      steering = steering +diff;
       total++;
     }
   }
   if (total > 0) {
-    steering = steering.divide(total);
+    steering = steering / total;
     steering = steering.setMag(maxSpeed);
-    steering = steering.sub(velocity);
+    steering = steering - velocity;
     steering = steering.limit(maxForce);
   }
   return steering;
@@ -91,20 +91,19 @@ Vector2f Boids::collision(std::vector<sf::CircleShape> &shape) {
 
   size_t total = 0;
   for (size_t i = 0; i < shape.size(); i++) {
-    float distance = position.dist(
+    float distance = position.distance(
         Vector2f(shape[i].getPosition().x, shape[i].getPosition().y));
     if ((distance < perceptionRadius) && (distance > 0.0f)) {
-      Vector2f diff = position.sub(
-          Vector2f(shape[i].getPosition().x, shape[i].getPosition().y));
-      if (distance < 1.0f) diff = diff.mult(1 / (distance * distance));
-      steering = steering.add(diff);
+      Vector2f diff = position - Vector2f(shape[i].getPosition().x, shape[i].getPosition().y);
+      if (distance < 1.0f) diff *= (1 / (distance * distance));
+      steering = steering +diff;
       total++;
     }
   }
   if (total > 0) {
-    steering = steering.divide(total);
+    steering = steering / total;
     steering = steering.setMag(maxSpeed);
-    steering = steering.sub(velocity);
+    steering = steering - velocity;
     steering = steering.limit(maxForce);
   }
   return steering;
@@ -116,17 +115,17 @@ Vector2f Boids::cohesion(Boids (&otherBoids)[S], int cohesionRadius) {
   Vector2f steering = Vector2f(0.f, 0.f);
   size_t total = 0;
   for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++) {
-    auto distance = position.dist(otherBoids[i].position);
+    auto distance = position.distance(otherBoids[i].position);
     if (*this != otherBoids[i] && distance < perceptionRadius) {
-      steering = steering.add(otherBoids[i].position);
+      steering += otherBoids[i].position;
       total++;
     }
   }
   if (total > 0) {
-    steering = steering.divide(total);
-    steering = steering.sub(position);
+    steering /= total;
+    steering -= position;
     steering = steering.setMag(maxSpeed);
-    steering = steering.sub(velocity);
+    steering -= velocity;
     steering = steering.limit(maxForce);
   }
   return steering;
@@ -136,38 +135,32 @@ template <std::size_t S>
 void Boids::flock(Boids (&otherBoids)[S], std::vector<sf::CircleShape> &shape,
                   int alignmentRadius, int cohesionRadius,
                   int separationRadius) {
-  Vector2f alignment = align(otherBoids, alignmentRadius);
-  Vector2f cohes = cohesion(otherBoids, cohesionRadius);
-  Vector2f sep = separation(otherBoids, separationRadius);
-  Vector2f col = collision(shape);
-
-  acceleration = acceleration.add(alignment);
-  acceleration = acceleration.add(cohes);
-  acceleration = acceleration.add(sep);
-  acceleration = acceleration.add(col);
+  acceleration += align(otherBoids, alignmentRadius);
+  acceleration += cohesion(otherBoids, cohesionRadius);
+  acceleration += separation(otherBoids, separationRadius);
+  acceleration += collision(shape);
 }
 
 void Boids::update() {
-  position = position.add(velocity);
-  velocity = velocity.add(acceleration);
+  position += velocity;
+  velocity += acceleration;
   velocity = velocity.limit(maxSpeed);
-  acceleration = acceleration.mult(0);
+  acceleration *= 0;
 
   float angle = atan2(velocity.y, velocity.x);
   angle = angle * (180 / M_PI) - 90;
   angle = (velocity.x < 0.0f || velocity.y < 0.0f) ? angle - 180 : angle + 180;
 
   sprite.setRotation(angle);
-  sprite.setPosition(position.ConverttoSF());
+  sprite.setPosition(position.x, position.y);
 }
 
 void Boids::draw(sf::RenderWindow &window) { window.draw(sprite); }
 
 bool operator==(const Boids &a, const Boids &b) {
-  return (a.position.x == b.position.x) && (a.position.y == b.position.y) &&
-         (a.velocity.x == b.velocity.x) && (a.velocity.y == b.velocity.y) &&
-         (a.acceleration.x == b.acceleration.x) &&
-         (a.acceleration.y == b.acceleration.y);
+  return a.position == b.position &&
+         a.velocity == b.velocity &&
+         a.acceleration == b.acceleration;
 }
 
 bool operator!=(const Boids &a, const Boids &b) { return !(a == b); }

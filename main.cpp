@@ -11,8 +11,7 @@
 int main() {
   srand(time(0));
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "BOIDS");
-  window.setFramerateLimit(30);
-
+  window.setFramerateLimit(60);
   tgui::Gui gui{window};
 
   auto alignmentSlider = tgui::Slider::create();
@@ -173,7 +172,7 @@ int main() {
     cohesionText->setText(std::to_string((int)cohesionSlider->getValue()));
     separationText->setText(std::to_string((int)separationSlider->getValue()));
 
-    window.clear();
+    window.clear(sf::Color(20, 30, 50));
     for (auto i : vec) {
       window.draw(i);
     }

@@ -1,56 +1,98 @@
-#ifndef VECTOR2_H
-#define VECTOR2_H
+#pragma once
+
 #include <iostream>
-#include "SFML/Graphics.hpp"
+#include <cmath>
 
 
-template<class T>
-class Vector2 final
-{
-public:
-  T x;
-  T y;
+template <class T>
+class Vector2 {
+ public:
+  using value_type = T;
+  using class_type = Vector2<T>;
+  value_type x;
+  value_type y;
 
-Vector2();
+  Vector2(T value) : x(value), y(value) {}
+  Vector2(T x = 0, T y = 0) : x(x), y(y) {}
+  Vector2(const class_type& vector) : x(vector.x), y(vector.y) {}
 
-Vector2(T x);
+  auto operator+(const class_type& right) const {
+    return class_type(x + right.x, y + right.y);
+  }
+  auto operator-(const class_type& right) const {
+    return class_type(x - right.x, y - right.y);
+  }
+  auto operator+(T n) const { return class_type(x + n, y + n); }
+  auto operator*(T n) { return class_type(x * n, y * n); }
+  auto operator/(T n) { return class_type(x / n, y / n); }
 
-Vector2(T x, T y);
+  auto operator==(const class_type& right) const {
+    return x == right.x && y == right.y;
+  }
+  auto operator!=(const class_type& right) const {
+    return x != right.x || y != right.y;
+  }
+  auto operator=(const class_type& right) {
+    x = right.x;
+    y = right.y;
+    return *this;
+  }
 
-template<class U>
-explicit Vector2<T>(const Vector2<U>& vector);
+  auto operator*= (const T &n) {
+    x *= n;
+    y *= n;
+    return *this;
+  }
+  auto operator/= (const T &n) {
+    x /= n;
+    y /= n;
+    return *this;
+  }
+  auto operator+= (const T &n) {
+    x += n;
+    y += n;
+    return *this;
+  }
+  auto operator-= (const T &n) {
+    x -= n;
+    y -= n;
+    return *this;
+  }
+  auto operator-= (const class_type &n) {
+    x -= n.x;
+    y -= n.y;
+    return *this;
+  }
+  auto operator+= (const class_type &n) {
+    x += n.x;
+    y += n.y;
+    return *this;
+  }
 
+  auto distance(const class_type& right) {
+    auto dx = x - right.x;
+    auto dy = y - right.y;
+    return sqrt(dx * dx + dy * dy);
+  }
 
-sf::Vector2<float> ConverttoSF();
-
-
-Vector2<T> add( Vector2<T>);
-Vector2<T> sub( Vector2<T>);
-Vector2<T> divide( int);
-Vector2<T> mult( int);
-float dist( Vector2<T>);
-Vector2<T> setMag( float);
-Vector2<T> limit( int);
-
-
-
-Vector2<T>& operator=(const Vector2<T>& Vector2Obj);
-
-Vector2<T> operator+( const Vector2<T>& Right );
-
-Vector2<T> operator-( const Vector2<T>& Right);
-
-
-bool operator!=(const Vector2<T> &obj);
-
-bool operator==(const Vector2<T> &obj);
-
+  auto magnitude() const { return sqrt(x * x + y * y); };
+  auto normalize() const {
+    const auto mag = magnitude();
+    return class_type(x / mag, y / mag);
+  }
+  auto setMag(float magnitude) {
+    const auto mag = this->magnitude();
+    return class_type((x * magnitude) / mag, (y * magnitude) / mag);
+  }
+  auto limit(float max) {
+    if (magnitude() > max) {
+      return setMag(max);
+    }
+    return *this;
+  }
+  auto heading() const { return atan2(y, x); }
 };
 
-typedef Vector2<int> Vector2i;
-typedef Vector2<unsigned int> Vector2u;
-typedef Vector2<float> Vector2f;
-
-
-
-#endif /* VECTOR2_H */
+using Vector2f = Vector2<float>;
+using Vector2i = Vector2<int>;
+using Vector2u = Vector2<unsigned int>;
