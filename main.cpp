@@ -1,5 +1,6 @@
-#include "SFML/Graphics.hpp"
-#include "TGUI/TGUI.hpp"
+#include <SFML/Graphics.hpp>
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 #include "Boids.h"
 #include <iostream>
 
@@ -100,7 +101,7 @@ int main()
         {
         case sf::Mouse::Left:
         {
-          if (resetButton->mouseOnWidget((sf::Vector2f)sf::Mouse::getPosition(window)))
+          if (resetButton->isMouseOnWidget((sf::Vector2f)sf::Mouse::getPosition(window)))
           {
             buttonPressed = true;
           }
@@ -108,15 +109,15 @@ int main()
           {
             mouseDraw = true;
           }
-          if (alignmentSlider->mouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+          if (alignmentSlider->isMouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
           {
             alignmentSliderMoved = true;
           }
-          if (cohesionSlider->mouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+          if (cohesionSlider->isMouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
           {
             cohesionSliderMoved = true;
           }
-          if (separationSlider->mouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
+          if (separationSlider->isMouseOnWidget(sf::Vector2f(event.mouseButton.x, event.mouseButton.y)))
           {
             separationSliderMoved = true;
           }
@@ -162,7 +163,7 @@ int main()
       separationSlider->setValue(sf::Mouse::getPosition(window).x / 2 - separationSlider->getPosition().x / 2);
     }
 
-    if (resetButton->mouseOnWidget((sf::Vector2f)sf::Mouse::getPosition(window)))
+    if (resetButton->isMouseOnWidget((sf::Vector2f)sf::Mouse::getPosition(window)))
     {
       resetButtonRenderer->setTextColor(tgui::Color(255, 0, 255));
     }

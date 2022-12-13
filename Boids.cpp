@@ -1,16 +1,9 @@
 #include "Boids.h"
 #include <cmath>
 
-#define PI 3.14159265
-
 int ReturnIntRandom(int lower, int upper)
 {
   return (rand() % (upper - lower + 1)) + lower;
-}
-
-float ReturnFloatRandom(float lower, float upper)
-{
-  float r3 = lower + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (upper - lower)));
 }
 
 Boids::Boids()
@@ -22,9 +15,8 @@ Boids::Boids()
   sprite.setScale(0.02f, 0.02f);
   position = Vector2f(ReturnIntRandom(0, 800), ReturnIntRandom(0, 500));
   sprite.setPosition(position.ConverttoSF());
-  auto pi = 4.0 * atan(1.0);
   auto phi = rand() / (double)(RAND_MAX);
-  phi *= 2.0 * pi;
+  phi *= 2.0 * M_PI;
   velocity = Vector2f(sin(phi), cos(phi));
 
   velocity = velocity.setMag(ReturnIntRandom(2, 4));
@@ -59,9 +51,9 @@ Vector2f Boids::align(Boids (&otherBoids)[S], int alignmentRadius)
 {
   int perceptionRadius = alignmentRadius;
   Vector2f steering = Vector2f(0.f, 0.f);
-  int total = 0;
+  size_t total = 0;
 
-  for (int i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
+  for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
   {
     auto distance = position.dist(otherBoids[i].position);
     if (*this != otherBoids[i] && distance < perceptionRadius)
@@ -87,8 +79,8 @@ Vector2f Boids::separation(Boids (&otherBoids)[S], int separationRadius)
   int perceptionRadius = separationRadius;
   Vector2f steering = Vector2f(0.f, 0.f);
 
-  int total = 0;
-  for (int i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
+  size_t total = 0;
+  for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
   {
     float distance = position.dist(otherBoids[i].position);
     if ((*this != otherBoids[i]) && (distance < perceptionRadius) && (distance > 0.0f))
@@ -116,8 +108,8 @@ Vector2f Boids::collision(std::vector<sf::CircleShape> &shape)
   int perceptionRadius = 50;
   Vector2f steering = Vector2f(0.f, 0.f);
 
-  int total = 0;
-  for (int i = 0; i < shape.size(); i++)
+  size_t total = 0;
+  for (size_t i = 0; i < shape.size(); i++)
   {
     float distance = position.dist(Vector2f(shape[i].getPosition().x, shape[i].getPosition().y));
     if ((distance < perceptionRadius) && (distance > 0.0f))
@@ -145,8 +137,8 @@ Vector2f Boids::cohesion(Boids (&otherBoids)[S], int cohesionRadius)
 {
   int perceptionRadius = cohesionRadius;
   Vector2f steering = Vector2f(0.f, 0.f);
-  int total = 0;
-  for (int i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
+  size_t total = 0;
+  for (size_t i = 0; i < sizeof(otherBoids) / sizeof(otherBoids[0]); i++)
   {
     auto distance = position.dist(otherBoids[i].position);
     if (*this != otherBoids[i] && distance < perceptionRadius)
@@ -188,7 +180,7 @@ void Boids::update()
   acceleration = acceleration.mult(0);
 
   float angle = atan2(velocity.y, velocity.x);
-  angle = angle * (180 / PI) - 90;
+  angle = angle * (180 / M_PI) - 90;
   angle = (velocity.x < 0.0f || velocity.y < 0.0f) ? angle - 180 : angle + 180;
 
   sprite.setRotation(angle);
