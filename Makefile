@@ -1,17 +1,17 @@
-all: sfml-app
-	./sfml-app
+EXEC = sfml-app
+CC = g++
+CFLAGS = -std=c++17 -c -Wall
+LDFLAGS = -std=c++17 -o $(EXEC) -ltgui -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
+SRCS = $(wildcard *.cpp)
+OBJS = $(SRCS:.cpp=.o)
 
-sfml-app: $(F2) Vector2.o Boids.o
-	g++ -std=c++17 $(F2) Vector2.o Boids.o -o sfml-app -ltgui -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
+all: $(EXEC)
 
-Vector2.o : Vector2.cpp Vector2.h;
-	g++ -std=c++17 -c Vector2.cpp
+$(EXEC): $(OBJS)
+	$(CC) $^ $(LDFLAGS)
 
-Boids.o : Boids.cpp Boids.h
-		g++ -std=c++17 -c Boids.cpp
-		
-$(F2) : Vector2.h $(F1) Boids.h
-		g++ -std=c++17 -c $(F1)
+%.o: %.cpp
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf *o sfml-app
+	$(RM) -rf *o $(EXEC)
